@@ -6,20 +6,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.yusuf.koincryptoapp.R
 import com.yusuf.koincryptoapp.databinding.FragmentCryptoListBinding
 import com.yusuf.koincryptoapp.model.Crypto
-import com.yusuf.koincryptoapp.service.CryptoAPI
-import com.yusuf.koincryptoapp.util.API.BASE_URL
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
+import com.yusuf.koincryptoapp.viewmodel.CryptoViewModel
+
 
 class CryptoListFragment : Fragment() , RecyclerViewAdapter.Listener{
 
@@ -27,14 +19,8 @@ class CryptoListFragment : Fragment() , RecyclerViewAdapter.Listener{
 
     private val binding get() = _binding!!
 
-    private var cryptoList: ArrayList<Crypto>? = null
-    private var job: Job? = null
-
-    private var  recyclerViewAdapter: RecyclerViewAdapter? = null
-
-    val exceptionHandler = CoroutineExceptionHandler { coroutineContext, throwable ->
-        println("Error: ${throwable.localizedMessage}" )
-    }
+    private var cryptoAdapter = RecyclerViewAdapter(arrayListOf(),this)
+    private lateinit var viewModel: CryptoViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,42 +41,15 @@ class CryptoListFragment : Fragment() , RecyclerViewAdapter.Listener{
         val layoutManager = LinearLayoutManager(requireContext())
         binding.recyclerView.layoutManager = layoutManager
 
-        loadData()
+        viewModel = ViewModelProvider(this).get(CryptoViewModel::class.java)
+        viewModel.getDataFromAPI()
     }
 
-    private fun loadData(){
-
-        val retrofit = Retrofit.Builder()
-            .baseUrl(BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-            .create(CryptoAPI::class.java)
-
-        job = CoroutineScope(Dispatchers.IO +exceptionHandler).launch {
-            val response = retrofit.getCryptos()
-
-            withContext(Dispatchers.Main){
-                if (response.isSuccessful){
-                    response.body()?.let {
-                            cryptoList = ArrayList(it)
-                        cryptoList?.let {
-                            recyclerViewAdapter = RecyclerViewAdapter(it,this@CryptoListFragment)
-                            binding.recyclerView.adapter = recyclerViewAdapter
-                        }
-
-                        }
-
-
-                    }
-                }
-            }
-        }
 
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-        job?.cancel()
     }
 
     override fun onItemClick(cryptoModel: Crypto) {
