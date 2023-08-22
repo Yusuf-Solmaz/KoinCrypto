@@ -26,6 +26,9 @@ class CryptoListFragment : Fragment() , RecyclerViewAdapter.Listener{
 
     private val viewModel by viewModel<CryptoViewModel>()
 
+    /*   Const. Injection yapmak istemiyorsak bu şekilde Field Injection yapılabilir.
+    private val api = get<CryptoAPI>()
+    private val apilazy by inject<CryptoAPI>()*/
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
