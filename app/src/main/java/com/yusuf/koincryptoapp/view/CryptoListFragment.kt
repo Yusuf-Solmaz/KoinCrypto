@@ -1,6 +1,6 @@
 package com.yusuf.koincryptoapp.view
 
-import android.opengl.Visibility
+
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -8,11 +8,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.yusuf.koincryptoapp.databinding.FragmentCryptoListBinding
 import com.yusuf.koincryptoapp.model.Crypto
 import com.yusuf.koincryptoapp.viewmodel.CryptoViewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
 class CryptoListFragment : Fragment() , RecyclerViewAdapter.Listener{
@@ -22,7 +22,10 @@ class CryptoListFragment : Fragment() , RecyclerViewAdapter.Listener{
     private val binding get() = _binding!!
 
     private var cryptoAdapter = RecyclerViewAdapter(arrayListOf(),this)
-    private lateinit var viewModel: CryptoViewModel
+    //private lateinit var viewModel: CryptoViewModel
+
+    private val viewModel by viewModel<CryptoViewModel>()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,7 +46,7 @@ class CryptoListFragment : Fragment() , RecyclerViewAdapter.Listener{
         val layoutManager = LinearLayoutManager(requireContext())
         binding.recyclerView.layoutManager = layoutManager
 
-        viewModel = ViewModelProvider(this).get(CryptoViewModel::class.java)
+       // viewModel = ViewModelProvider(this).get(CryptoViewModel::class.java)
 
         observeLiveData()
 
